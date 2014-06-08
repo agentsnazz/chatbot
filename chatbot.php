@@ -1,38 +1,15 @@
 <?php
-/* Jabber Class Example
- * Copyright 2002-2007, Steve Blinch
- * http://code.blitzaffe.com
- * ============================================================================
- *
- * DETAILS
- *
- * Provides a very basic example of how to use class_Jabber.php.
- *
- * This example connects to a Jabber server, logs in, fetches (and displays)
- * the roster, and then waits until a message is received from another contact.
- *
- * It then starts a countdown which, in sequence:
- * 
- * 1) sends a "composing" event to the other contact (eg: "so-and-so is typing a message"),
- * 2) sends a "composing stopped" event,
- * 3) sends another "composing" event",
- * 4) sends a message to the other contact,
- * 5) logs out
- *
- */
- 
+
 // set your Jabber server hostname, username, and password here
-define("JABBER_SERVER","cloud.mis-solutions.com");
-define("JABBER_USERNAME","robot");
-define("JABBER_PASSWORD","a0011b");
+$userAtServer = explode("@", $argv[0]);
+define("JABBER_SERVER",$userAtServer[1]);
+define("JABBER_USERNAME",$userAtServer[0]);
+define("JABBER_PASSWORD",$argv[1]);
 
 define("RUN_TIME",120);  // set a maximum run time of 60 seconds
 define("CBK_FREQ",1);   // fire a callback event every second
 
 define("VERSION","bravo");
-
-
-
 
 // This class handles all events fired by the Jabber client class; you
 // can optionally use individual functions instead of a class, but this
