@@ -3,8 +3,7 @@
     "description" : "Simple farewell.",
     "type" : "conversation",
 
-    "speech" :
-    {
+    "speech" : {
         "default" : [
             "Goodbye."
         ],

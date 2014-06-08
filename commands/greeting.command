@@ -3,8 +3,8 @@
     "description" : "Simple greeting response.",
     "type" : "conversation",
 
-    "speech" :
-    {
+    "speech" : {
+    
         "default" : [
             "Greetings."
         ],
