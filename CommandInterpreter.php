@@ -8,7 +8,7 @@
 class CommandInterpreter {
 
     private $commandList = array();
-    private $verbose = False;
+    private $verbose = True;
     private $mood = "friendly";
 
     function initialize() {
@@ -30,6 +30,7 @@ class CommandInterpreter {
     // interprets a command
     // returns an array: [ text to say, action to perform]
     function interpret($input) {
+        
         $command = $this->commandList[strtolower($input)];
         $say = "";
         $action = null;
@@ -46,7 +47,7 @@ class CommandInterpreter {
                 $action = $command->action;
             }
             
-            return [$say, $action];
+            return array($say,$action);
         } else {
             return $this->interpret("Unrecognized");
         }

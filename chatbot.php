@@ -1,23 +1,24 @@
 <?php
 
 // set your Jabber server hostname, username, and password here
-$userAtServer = explode("@", $argv[0]);
+$userAtServer = explode("@", $argv[1]);
 define("JABBER_SERVER",$userAtServer[1]);
 define("JABBER_USERNAME",$userAtServer[0]);
-define("JABBER_PASSWORD",$argv[1]);
+define("JABBER_PASSWORD",$argv[2]);
 
 define("RUN_TIME",120);  // set a maximum run time of 60 seconds
 define("CBK_FREQ",1);   // fire a callback event every second
 
-define("VERSION","bravo");
+date_default_timezone_set(America/New_York);
 
 // This class handles all events fired by the Jabber client class; you
 // can optionally use individual functions instead of a class, but this
 // method is a bit cleaner.
 class TestMessenger {
     
-    function TestMessenger(&$jab) {
+    function TestMessenger(&$jab, &$interpreter) {
         $this->jab = &$jab;
+        $this->interpreter = &$interpreter;
         $this->first_roster_update = true;
         
         echo "Created!\n";
@@ -63,28 +64,24 @@ class TestMessenger {
     function handleHeartbeat() {
         echo "Heartbeat - ";
         
-        if ($this->commanded==1) {
+        if ($this->commanded==2) {
             //Start thinking
             $this->jab->composing($this->last_msg_from,$this->last_msg_id);
             $command = strtolower($this->last_message);
 
             echo "Command Received:\n";
             echo "            '".$command."'\n";
-            
+            echo "Waiting just a moment...\n";
 
-            if (strcmp($command, "robot, make me a sandwich")==0) {
-                echo "          - Command Recognized: sandwich\n";
-                $this->jab->composing($this->last_msg_from,$this->last_msg_id,false);
-                $this->jab->message($this->last_msg_from,"chat",NULL,"Sorry, I'm all out of mustard.");
-            } elseif (strcmp($command, "robot, shut down")==0) {
-                echo "          - Command Recognized: exiting\n";
-                $this->jab->composing($this->last_msg_from,$this->last_msg_id,false);
-                $this->jab->message($this->last_msg_from,"chat",NULL,"Goodbye!");
-                exit;
-            } else {
-                echo "          - Command Not Recognized\n";
-                $this->jab->message($this->last_msg_from,"chat",NULL,"Sorry, I don't recognize that command.");
-            }
+            $this->commanded = 1;
+        } elseif ($this->commanded==1) {
+            
+            $reply = $this->interpreter->interpret($command);
+
+            $this->jab->message();
+            $this->jab->composing($this->last_msg_from,$this->last_msg_id,false);
+            $this->jab->message($this->last_msg_from,"chat",NULL,$reply['say']);
+
             $this->commanded = 0;
         } else {
             echo "Waiting for incoming message ...\n";
@@ -115,7 +112,7 @@ class TestMessenger {
         $this->last_msg_id = $id;
         $this->last_msg_from = $from;
 
-        $this->commanded = 1;
+        $this->commanded = 2;
     }
     
     function _contact_info($contact) {
@@ -152,12 +149,18 @@ class TestMessenger {
 // include the Jabber class
 require_once("libraries\class_Jabber.php");
 
+// include the Command Interpreter class
+include 'CommandInterpreter.php';
+
+// create the Command Interpreter
+$interpreter = new CommandInterpreter();
+
 // create an instance of the Jabber class
 $display_debug_info = true;
 $jab = new Jabber($display_debug_info);
 
 // create an instance of our event handler class
-$test = new TestMessenger($jab);
+$test = new TestMessenger($jab, $interpreter);
 
 // set handlers for the events we wish to be notified about
 $jab->set_handler("connected",$test,"handleConnected");
@@ -170,7 +173,7 @@ $jab->set_handler("message_chat",$test,"handleMessage");
 //$jab->set_handler("debug_log",$test,"handleDebug");
 $jab->set_handler("rosterupdate",$test,"handleRosterUpdate");
 
-echo "Connecting ...\n";
+echo "Connecting as ".JABBER_USERNAME." to ".JABBER_SERVER."\n";
 
 // connect to the Jabber server
 if (!$jab->connect(JABBER_SERVER)) {
