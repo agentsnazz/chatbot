@@ -23,9 +23,9 @@
  */
  
 // set your Jabber server hostname, username, and password here
-define("JABBER_SERVER","cloud.mis-solutions.com");
+define("JABBER_SERVER","localhost");
 define("JABBER_USERNAME","robot");
-define("JABBER_PASSWORD","a0011b");
+define("JABBER_PASSWORD","Vfr45tgB");
 
 define("RUN_TIME",60);  // set a maximum run time of 30 seconds
 define("CBK_FREQ",1);   // fire a callback event every second
